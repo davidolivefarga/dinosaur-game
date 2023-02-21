@@ -1,19 +1,24 @@
+import CurrentScore from "./gameObjects/CurrentScore.js";
+
 export default class Game {
 	constructor({ width, height }) {
-		this.width = width;
-		this.height = height;
+		const { canvas, canvasCtx } = this._createGameCanvas({ width, height });
 
-		const { canvas, canvasContext } = this.createGameCanvas({ width, height });
+		this._canvas = canvas;
+		this._canvasCtx = canvasCtx;
 
-		canvasContext.fillStyle = "green";
-		canvasContext.fillRect(10, 10, 150, 100);
+		this._gameObjects = [new CurrentScore()];
 
 		document.body.appendChild(canvas);
 	}
 
-	createGameCanvas({ width, height }) {
+	init() {
+		this._startGameLoop();
+	}
+
+	_createGameCanvas({ width, height }) {
 		const canvas = document.createElement("canvas");
-		const canvasContext = canvas.getContext("2d");
+		const canvasCtx = canvas.getContext("2d");
 
 		// Set display size
 		canvas.style.width = `${width}px`;
@@ -25,8 +30,29 @@ export default class Game {
 		canvas.height = Math.floor(height * scale);
 
 		// Normalize coordinate system to use CSS pixels
-		canvasContext.scale(scale, scale);
+		canvasCtx.scale(scale, scale);
 
-		return { canvas, canvasContext };
+		return { canvas, canvasCtx };
+	}
+
+	_startGameLoop() {
+		const step = () => {
+			this._canvasCtx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+
+			// TODO: Remove this test code
+			this._canvasCtx.fillStyle = "lightgray";
+			this._canvasCtx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+
+			this._gameObjects.forEach((gameObject) => {
+				gameObject.update();
+				gameObject.draw({ canvas: this._canvas, canvasCtx: this._canvasCtx });
+			});
+
+			requestAnimationFrame(() => {
+				step();
+			});
+		};
+
+		step();
 	}
 }

@@ -1,18 +1,29 @@
 import CurrentScore from "./gameObjects/CurrentScore.js";
+import Instructions from "./gameObjects/Instructions.js";
 
 export default class Game {
-	constructor({ width, height }) {
+	constructor({ width, height } = { width: 600, height: 150 }) {
 		const { canvas, canvasCtx } = this._createGameCanvas({ width, height });
 
 		this._canvas = canvas;
 		this._canvasCtx = canvasCtx;
 
-		this._gameObjects = [new CurrentScore()];
-
 		document.body.appendChild(canvas);
 	}
 
 	init() {
+		const instructions = new Instructions();
+
+		// TODO: Remove this test code
+		this._canvasCtx.fillStyle = "lightgray";
+		this._canvasCtx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+
+		instructions.draw({ canvas: this._canvas, canvasCtx: this._canvasCtx });
+	}
+
+	start() {
+		this._gameObjects = [new CurrentScore()];
+
 		this._startGameLoop();
 	}
 
